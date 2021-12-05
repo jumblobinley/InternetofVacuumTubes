@@ -12,9 +12,13 @@ extern "C" {
 #include "user_interface.h"
 }
 
+//This is an active low LED output on GPIO2
 #define LED0 2
+#define LED_ON false
+#define LED_OFF true
+
 #define flamePin 14
-#define VERSION 2.2
+#define VERSION 1.0
 
 
 #define TIMECOUNTERMAX 3300000
@@ -54,7 +58,7 @@ uint32_t time_counter = TIMECOUNTERMAX;
       bool _flicker = true;
       const size_t bufferSize = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(1) + 10*JSON_OBJECT_SIZE(4) + 320;
       const char* ssid     = "IOP_Network";
-      const char* password = "xxxx"; 
+      const char* password = "xxxxxx"; 
       
       
 #endif          
@@ -67,13 +71,30 @@ uint32_t time_counter = TIMECOUNTERMAX;
       
       //this is for neo pixel strips and wires
       Adafruit_NeoPixel lights = Adafruit_NeoPixel(LED_COUNT, flamePin, NEO_GRB + NEO_KHZ800);
-      //Adafruit_NeoPixel lights = Adafruit_NeoPixel(LED_COUNT, flamePin, NEO_RGB + NEO_KHZ800);
 #endif
-
 
 
 /*  Arduino IDE Setup:
  *   
+ *   --Ever Since upgrading my router to an ASUS RT-AX86U, the ESP 2.2.1 firmware update causes eratic bahaviour
+ *   -- I was foced to downgrade the AI-Thinker ESP8266 firmware via these settings 
+ *   
+ *   Actual Board: LoLin NodeMCU lua V3  
+ *   Go to File->Preferences and copy the URL below to get the ESP board manager extensions:
+ *   http://arduino.esp8266.com/stable/package_esp8266com_index.json
+ *   
+ *   Tools -> Board -> Generic ESP 8266 module
+ *   Tools -> Flash Size -> 4M (FS: 2M ...)
+ *   Tools -> CPU Frequency -> 80 Mhz
+ *   Tools -> Upload Speed -> 115200
+ *   Tools -> Erase flash -> "all flash contents"
+ *   Tools -> ExpressiF FW -> nonos-sdk 2.2.1 (legacy)
+ *   
+ *   
+ *   Tools-->Port--> (whatever it is)
+ *   
+ *   
+ *   //Not Used
  *   Board:  NodeMCU 1.0 (ESP-12E Module)
  *   Go to File->Preferences and copy the URL below to get the ESP board manager extensions:
  *   http://arduino.esp8266.com/stable/package_esp8266com_index.json
@@ -107,9 +128,10 @@ void setup(void)
   
   //Seting up GPIO outputs
 
+  //This is an active low LED output on GPIO2
   pinMode(LED0, OUTPUT);
   
-  digitalWrite(LED0, 1);
+  digitalWrite(LED0, LED_ON);
   
   Serial.begin(115200);
   Serial.println("Starting");
@@ -207,7 +229,7 @@ void setup(void)
   //lights.show();
   
   delay(200);  
-  digitalWrite(LED0, 1); 
+  digitalWrite(LED0, LED_OFF); 
 }
 
 /********************************************************************
@@ -230,7 +252,8 @@ void loop(void)
     {
        // Do something at a slower cycle rate than the loop here
        //Serial.println("Getting lights json file from S3");
-        
+        //digitalWrite(LED0, true);
+        //digitalWrite(LED0, false);
        //time_counter = 0;
     }
   } 
@@ -244,7 +267,7 @@ void loop(void)
 
 void handleNotFound()
 {
-  digitalWrite(LED0, 1);
+  digitalWrite(LED0, LED_ON);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -257,14 +280,15 @@ void handleNotFound()
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  digitalWrite(LED0, 0);
+  digitalWrite(LED0, LED_OFF);
 }
 
 /* This is the main entry point.  The master web page is generated here */
 void handleRoot() 
 {
 
-  digitalWrite(LED0, 1);
+  digitalWrite(LED0, LED_ON);
+  
   String page = "<!DOCTYPE HTML> <html> <head> ";
   page.concat("<link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\">");
   
@@ -340,16 +364,18 @@ void handleRoot()
 
   page.concat("  </body> </html> ");
   
+  digitalWrite(LED0, LED_OFF);
 
   server.send(200, "text/html", page);
 
-  digitalWrite(LED0, 0);
+  
 }
 
 /* This endpoint describes the API'S */
 void apiRoot() 
 {
 
+  digitalWrite(LED0, LED_ON);
   String page = "<!DOCTYPE HTML> <html> <head> ";
   page.concat("<style> body {background-color: LIGHTSALMON;} div  {font-family: arial; font-size: 14px;} "); 
   page.concat(" button {background-color: green; color: #900; font-weight: bold; border: 3px double #FC6; font-size: 150%; text-transform: uppercase; text-align:center} ");
@@ -391,6 +417,7 @@ void apiRoot()
   page.concat("</font>  </body> </html> ");
 
   server.send(200, "text/html", page);
+  digitalWrite(LED0, LED_ON);
 
 }
 
