@@ -58,7 +58,7 @@ uint32_t time_counter = TIMECOUNTERMAX;
       bool _flicker = true;
       const size_t bufferSize = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(1) + 10*JSON_OBJECT_SIZE(4) + 320;
       const char* ssid     = "IOP_Network";
-      const char* password = "xxxxxx"; 
+      const char* password = "xxxx1"; 
       
       
 #endif          
@@ -89,10 +89,9 @@ uint32_t time_counter = TIMECOUNTERMAX;
  *   Tools -> Upload Speed -> 115200
  *   Tools -> Erase flash -> "all flash contents"
  *   Tools -> ExpressiF FW -> nonos-sdk 2.2.1 (legacy)
- *   
+ *   Tools -> debug level -> none
  *   
  *   Tools-->Port--> (whatever it is)
- *   
  *   
  *   //Not Used
  *   Board:  NodeMCU 1.0 (ESP-12E Module)
@@ -202,6 +201,8 @@ void setup(void)
             server.on("/TEST", testRoot);             // Test routine end point: http://192.168.1.143/TEST
           
             server.on("/API", apiRoot);             // Test routine end point: http://192.168.1.143/API
+
+            server.on("/HEALTH", healthRoot);             // Test routine end point: http://192.168.1.143/HEALTH
           
           
           //  server.on("/inline", []()             //and example of an inline endpoint: http://192.168.1.143/inline
@@ -354,7 +355,6 @@ void handleRoot()
   page.concat(" <A href='/COLOR?red=254&green=50&blue=0'>COLOR</A> <br/>");
   page.concat(" <A href='/TEST'>TEST</A> <br/>");
   page.concat(" <A href='/API'>API</A> <br/>");
-  page.concat(" <A href='/LOAD'>LOAD</A> <br/>");
 
   page.concat("<br/><br/>");
   page.concat("</div> <hr/> \n");
@@ -625,6 +625,16 @@ String returnHTML( String inText)
 
   return page;
 }
+
+void healthRoot()
+{
+  digitalWrite(LED0, LED_ON);
+  String message = "working\n\n";
+  server.send(200, "text/plain", message);
+  digitalWrite(LED0, LED_OFF);
+}
+
+
 
 //--------------------------------------------- utilities -------------------------------------------------------------
 
