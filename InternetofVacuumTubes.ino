@@ -58,7 +58,7 @@ uint32_t time_counter = TIMECOUNTERMAX;
       bool _flicker = true;
       const size_t bufferSize = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(1) + 10*JSON_OBJECT_SIZE(4) + 320;
       const char* ssid     = "IOP_Network";
-      const char* password = "xxxx1"; 
+      const char* password = "xxxxxx"; 
       
       
 #endif          
@@ -626,10 +626,15 @@ String returnHTML( String inText)
   return page;
 }
 
+/*
+ * Health Root
+ * The main edge controller will be calling /HEALTH and expects "working" as response
+ * test/plain with a status code of 200 is expected
+ */
 void healthRoot()
 {
   digitalWrite(LED0, LED_ON);
-  String message = "working\n\n";
+  String message = "working";
   server.send(200, "text/plain", message);
   digitalWrite(LED0, LED_OFF);
 }
